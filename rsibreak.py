@@ -26,7 +26,7 @@ stdate = ed - timedelta(dayback)
 
 st.set_page_config(layout="wide")
 st.title('Stock Trading RSI 60 crossing')
-day_to_getdata = st.number_input(label='Daysback',min_value=-10,max_value=5)
+day_to_getdata = st.number_input(label='Daysback',min_value=-10,max_value=0,value=-1)
 st.write('Enter the number of days to get data in -1,-2 ,-3')
 
 
