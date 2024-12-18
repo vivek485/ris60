@@ -41,7 +41,7 @@ ist_timezone = pytz.timezone('Asia/Kolkata')
 
 fromdate = conv(stdate)
 todate = conv(ed)
-
+col1,col2 = st.columns(2,vertical_alignment="top")
 
 
 
@@ -54,6 +54,7 @@ async def getdata(session, stock):
         'Accept-Language': 'en-US,en;q=0.5',
         #'Accept-Encoding': 'gzip, deflate, br'
     }
+    
     url = f'https://groww.in/v1/api/charting_service/v2/chart/exchange/NSE/segment/CASH/{stock}?endTimeInMillis={todate}&intervalInMinutes={interval}&startTimeInMillis={fromdate}'
     async with session.get(url, headers=headers) as response:
         try:
@@ -125,32 +126,31 @@ async def getdata(session, stock):
                 fig = go.Figure(data=[go.Candlestick(x=newdf.index, open=newdf.Open, close=newdf.Close, high=newdf.High,low=newdf.Low,name=stock),
                                       go.Scatter(x=newdf.index, y=newdf.ma200, line=dict(color='red', width=2),name='ma200')
                                       ])
-                # fig.add_trace(
-                #     go.Scatter(x=newdf[newdf['o-hs']==1].index, y=newdf[newdf['o-hs']==1]['High'], mode='markers', marker_symbol='triangle-down',
-                #                marker_size=25,marker_color='red'))
+                fig.add_trace(
+                    go.Scatter(x=newdf[newdf['rsibreakdown']==1].index, y=newdf[newdf['rsibreakdown']==1]['High'], mode='markers', marker_symbol='triangle-down',
+                               marker_size=25,marker_color='red'))
                
 
                 fig.update_layout(autosize=False, width=1800, height=800, xaxis_rangeslider_visible=False)
                 fig.layout.xaxis.type = 'category'
+                col1.plotly_chart(fig, use_container_width=True)
                 
-                st.write(' rsi sell stratergy')
-                st.plotly_chart(fig)
+               
 
             if last_candle['rsibreakup'] == 1:#3
 
                 buystock.append(last_candle['symbol'])
                 fig = go.Figure(data=[go.Candlestick(x=newdf.index, open=newdf.Open, close=newdf.Close, high=newdf.High,low=newdf.Low,name=stock),                                     
                                       go.Scatter(x=newdf.index, y=newdf.ma200, line=dict(color='blue', width=2),name='ma200')])
-                # fig.add_trace(
-                #     go.Scatter(x=newdf[newdf['o-ls']==1].index, y=newdf[newdf['o-ls']==1]['Low'], mode='markers', marker_symbol='triangle-up',
-                #                marker_size=25,marker_color='green'))
+                fig.add_trace(
+                    go.Scatter(x=newdf[newdf['rsibreakup']==1].index, y=newdf[newdf['rsibreakup']==1]['Low'], mode='markers', marker_symbol='triangle-up',
+                               marker_size=25,marker_color='green'))
                 
 
                 fig.update_layout(autosize=False, width=1800, height=800, xaxis_rangeslider_visible=False)
                 fig.layout.xaxis.type = 'category'
                 
-                st.write(' rsi buy stratergy')
-                st.plotly_chart(fig)
+                col2.plotly_chart(fig, use_container_width=True)
 
 
 
@@ -185,7 +185,7 @@ asyncio.run(main())
 
 
 st.write('buy')
-st.write(buystock)
+st.write(pd.DataFrame(buystock))
 st.write('sell')
-st.write(sellstock)
+st.write(pd.DataFrame(sellstock))
 
